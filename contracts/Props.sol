@@ -31,9 +31,8 @@ contract Props {
 
     function giveProps(string email) {
         address account = users[email].account;
-        if (account == msg.sender || account == 0) {
+        if (account == msg.sender || account == 0)
             throw;
-        }
         users[email].props += 1;
     }
 }
