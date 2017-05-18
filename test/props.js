@@ -12,7 +12,7 @@ contract('Props', function(accounts) {
   describe('adding user', function() {
     let user = 'someone@test.com';
 
-    describe('when user does NOT exist', function() {
+    describe('when user does NOT exist and executing as owner', function() {
       it('creates new user', function() {
         return instance.userExists(user).then(function(exists) {
           assert.isFalse(exists);
@@ -23,25 +23,41 @@ contract('Props', function(accounts) {
           assert.isTrue(exists);
         });
       });
+    });
 
-      describe('when user already exists', function() {
-        beforeEach(function() {
-          return instance.addUser(user, accounts[0]);
-        });
-
-        it('does NOT change user address', function() {
-          return instance.addUser(user, accounts[1]).then(function() {
-            assert.fail(0, 1, 'Expected an error to be thrown');
-          }).catch(function(error) {
-            assert.notEqual(error.message.match('invalid opcode', undefined));
-            return instance.getAccount(user);
-          }).then(function(account) {
-            assert.equal(account, accounts[0]);
-          });
+    describe('when executing as NOT owner', function() {
+      it('does NOT create new user', function() {
+        return instance.userExists(user).then(function(exists) {
+          assert.isFalse(exists);
+          return instance.addUser(user, accounts[0], {from: accounts[1]});
+        }).then(function() {
+          assert.fail(0, 1, 'Expected an error to be thrown');
+        }).catch(function(error) {
+          assert.notEqual(error.message.match('invalid opcode', undefined));
+          return instance.userExists(user);
+        }).then(function(exists) {
+          assert.isFalse(exists);
         });
       });
     });
-  })
+
+    describe('when user already exists', function() {
+      beforeEach(function() {
+        return instance.addUser(user, accounts[0]);
+      });
+
+      it('does NOT change user address', function() {
+        return instance.addUser(user, accounts[1]).then(function() {
+          assert.fail(0, 1, 'Expected an error to be thrown');
+        }).catch(function(error) {
+          assert.notEqual(error.message.match('invalid opcode', undefined));
+          return instance.getAccount(user);
+        }).then(function(account) {
+          assert.equal(account, accounts[0]);
+        });
+      });
+    });
+  });
 
   describe('giving props', function() {
     let firstUser = 'first@test.com';
