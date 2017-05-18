@@ -25,23 +25,18 @@ contract('Props', function(accounts) {
       });
 
       describe('when user already exists', function() {
-        beforeEach(function(done) {
-          instance.addUser(user, accounts[0]).then(function() {
-            return instance.giveProps(user, {from: accounts[1]});
-          }).then(function() {
-            done();
-          });
+        beforeEach(function() {
+          return instance.addUser(user, accounts[0]);
         });
 
-        it('does NOT reset user props', function() {
-          return instance.getProps(user, function(given) {
-            assert.equal(given, 1);
-            return instance.addUser(user, accounts[0]);
+        it('does NOT change user address', function() {
+          return instance.addUser(user, accounts[1]).then(function() {
+            assert.fail(0, 1, 'Expected an error to be thrown');
           }).catch(function(error) {
             assert.notEqual(error.message.match('invalid opcode', undefined));
-            return instance.getProps(user);
-          }).then(function(given) {
-            assert.equal(given, 1);
+            return instance.getAccount(user);
+          }).then(function(account) {
+            assert.equal(account, accounts[0]);
           });
         });
       });
@@ -51,52 +46,96 @@ contract('Props', function(accounts) {
   describe('giving props', function() {
     let firstUser = 'first@test.com';
     let secondUser = 'second@test.com';
+    let thirdUser = 'third@test.com';
+    let fakeUser = 'someone@else.fake';
 
     beforeEach(function() {
       return Props.new().then(function(_instance) {
         instance = _instance;
         return Promise.all([
           instance.addUser(firstUser, accounts[0]),
-          instance.addUser(secondUser, accounts[1])
+          instance.addUser(secondUser, accounts[1]),
+          instance.addUser(thirdUser, accounts[2])
         ]);
       });
     });
 
-    it('increment user props by 1', function() {
-      return instance.getProps(secondUser).then(function(given) {
-        assert.equal(given, 0);
-        return instance.giveProps(secondUser, {from: accounts[0]});
+    it('registers the given props', function() {
+      return instance.getPropsCount().then(function(count) {
+        assert.equal(count, 0);
+        return instance.giveProps(firstUser, secondUser, 'test');
       }).then(function() {
-        return instance.getProps(secondUser);
+        return instance.getPropsCount();
       }).then(function(given) {
         assert.equal(given, 1);
+        return instance.getProps(0);
+      }).then(function(props) {
+        assert.deepEqual(props, [firstUser, secondUser, 'test']);
       });
     });
 
     describe('when sender is giving a props to himself', function() {
       it('does NOT increment user props', function() {
-        return instance.getProps(secondUser).then(function(given) {
+        return instance.getPropsCount().then(function(given) {
           assert.equal(given, 0);
-          return instance.giveProps(secondUser, {from: accounts[1]});
+          return instance.giveProps(firstUser, firstUser, 'test');
+        }).then(function() {
+          assert.fail(0, 1, 'Error expected');
         }).catch(function(error) {
           assert.notEqual(error.message.match('invalid opcode', undefined));
-          return instance.getProps(secondUser);
+          return instance.getPropsCount();
         }).then(function(given) {
           assert.equal(given, 0);
         });
       });
     });
 
-    describe('when sender is giving a props to not existing user', function() {
-      let fakeUser = 'someone@else.fake';
-
+    describe('when receiver email is NOT registered', function() {
       it('does NOT increment user props', function() {
-        return instance.getProps(fakeUser).then(function(given) {
+        return instance.getPropsCount().then(function(given) {
           assert.equal(given, 0);
-          return instance.giveProps(fakeUser, {from: accounts[1]});
+          return instance.giveProps(firstUser, fakeUser, 'test');
+        }).then(function() {
+          assert.fail(0, 1, 'Error expected');
         }).catch(function(error) {
           assert.notEqual(error.message.match('invalid opcode', undefined));
-          return instance.getProps(fakeUser);
+          return instance.getPropsCount();
+        }).then(function(given) {
+          assert.equal(given, 0);
+        });
+      })
+    });
+
+    describe('when sender email is NOT registered to current eth address', function() {
+      it('does NOT increment user props', function() {
+        return instance.getPropsCount().then(function(given) {
+          assert.equal(given, 0);
+          return instance.giveProps(secondUser, thirdUser, 'test');
+        }).then(function() {
+          console.log('error expected');
+          assert.fail(0, 1, 'Error expected');
+        }).catch(function(error) {
+          console.log('catching');
+          assert.notEqual(error.message.match('invalid opcode', undefined));
+          return instance.getPropsCount();
+        }).then(function(given) {
+          assert.equal(given, 0);
+        });
+      })
+    });
+
+    describe('when sender email is NOT registered', function() {
+      it('does NOT increment user props', function() {
+        return instance.getPropsCount().then(function(given) {
+          assert.equal(given, 0);
+          return instance.giveProps(fakeUser, secondUser, 'test');
+        }).then(function() {
+          console.log('error expected');
+          assert.fail(0, 1, 'Error expected');
+        }).catch(function(error) {
+          console.log('catching');
+          assert.notEqual(error.message.match('invalid opcode', undefined));
+          return instance.getPropsCount();
         }).then(function(given) {
           assert.equal(given, 0);
         });
