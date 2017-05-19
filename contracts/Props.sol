@@ -1,7 +1,7 @@
 pragma solidity ^0.4.11;
 
+import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 
-import "./zeppelin/ownership/Ownable.sol";
 
 contract Props is Ownable {
 
@@ -13,6 +13,8 @@ contract Props is Ownable {
 
     mapping (string => address) users;
     GivenProps[] allProps;
+
+    event PropsGiven(string from, string to, string description);
 
     function Props() {
     }
@@ -28,9 +30,10 @@ contract Props is Ownable {
         address toAccount = users[to];
         if (fromAccount != msg.sender || toAccount == 0 || toAccount == msg.sender)
             throw;
-        allProps.push(GivenProps(
-            {from: from, to: to, description: description}
-        ));
+        allProps.push(
+            GivenProps({from: from, to: to, description: description})
+        );
+        PropsGiven(from, to, description);
     }
 
     function userExists(string email) constant returns (bool) {
@@ -45,9 +48,5 @@ contract Props is Ownable {
 
     function getPropsCount() constant returns (uint) {
         return allProps.length;
-    }
-
-    function getProps(uint index) constant returns (string, string, string) {
-        return (allProps[index].from, allProps[index].to, allProps[index].description);
     }
 }
