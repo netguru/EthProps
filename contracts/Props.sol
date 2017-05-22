@@ -1,9 +1,7 @@
 pragma solidity ^0.4.11;
 
-import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 
-
-contract Props is Ownable {
+contract Props {
 
     struct GivenProps {
         string from;
@@ -19,7 +17,7 @@ contract Props is Ownable {
     function Props() {
     }
 
-    function addUser (string email, address account) onlyOwner {
+    function register(string email, address account) {
         if (userExists(email))
             throw;
         users[email] = account;
