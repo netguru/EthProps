@@ -16,7 +16,7 @@ contract('Props', function(accounts) {
       it('creates new user', function() {
         return instance.userExists(user).then(function(exists) {
           assert.isFalse(exists);
-          return instance.register(user, accounts[0]);
+          return instance.register(user);
         }).then(function() {
           return instance.userExists(user);
         }).then(function(exists) {
@@ -27,11 +27,11 @@ contract('Props', function(accounts) {
 
     describe('when user already exists', function() {
       beforeEach(function() {
-        return instance.register(user, accounts[0]);
+        return instance.register(user);
       });
 
       it('does NOT change user address', function() {
-        return instance.register(user, accounts[1]).then(function() {
+        return instance.register(user, {from: accounts[1]}).then(function() {
           assert.fail(0, 1, 'Expected an error to be thrown');
         }).catch(function(error) {
           assert.notEqual(error.message.match('invalid opcode', undefined));
@@ -49,8 +49,8 @@ contract('Props', function(accounts) {
 
     beforeEach(function() {
       return Promise.all([
-        instance.register(firstUser, accounts[0]),
-        instance.register(secondUser, accounts[1])
+        instance.register(firstUser),
+        instance.register(secondUser, {from: accounts[1]})
       ]).then(function() {
         return instance.giveProps(firstUser, secondUser, 'first props');
       }).then(function() {
@@ -91,9 +91,9 @@ contract('Props', function(accounts) {
 
     beforeEach(function() {
       return Promise.all([
-        instance.register(firstUser, accounts[0]),
-        instance.register(secondUser, accounts[1]),
-        instance.register(thirdUser, accounts[2])
+        instance.register(firstUser),
+        instance.register(secondUser, {from: accounts[1]}),
+        instance.register(thirdUser, {from: accounts[2]})
       ]);
     });
 

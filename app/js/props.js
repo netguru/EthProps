@@ -6,9 +6,32 @@ import props_artifacts from '../../build/contracts/Props.json'
 let Props = contract(props_artifacts);
 let account;
 
+window.Registration = {
+  start: function() {
+    $('.js-registration-form').on('submit', Registration.onFormSubmit);
+  },
+
+  onFormSubmit: function(event) {
+    event.preventDefault();
+    let username = $('.js-username').val();
+    Props.deployed().then(function(instance) {
+      return instance.register(username, account, {from: account});
+    }).then(Registration.onSuccess).catch(Registration.onFail);
+  },
+
+  onSuccess: function() {
+    Alerts.display('success', 'Registration successful');
+    $('.js-username').val('');
+  },
+
+  onFail: function(err) {
+    console.log(err);
+    Alerts.display('danger', 'Registration failed, try again (username taken?)');
+  }
+};
+
 window.App = {
   start: function() {
-    Props.setProvider(web3.currentProvider);
     $('.js-props-form').on('submit', App.onFormSubmit);
     App.refreshPropsCount();
     App.initializeProps();
@@ -47,24 +70,14 @@ window.App = {
   },
 
   onPropsGiven: function() {
-    App.displayAlert('success', 'Props given!');
+    Alerts.display('success', 'Props given!');
   },
 
   onPropsFailed: function(err) {
     console.error(err);
-    App.displayAlert('danger', 'Props failed, try again');
+    Alerts.display('danger', 'Props failed, try again');
   },
 
-  displayAlert: function(alertClass, text) {
-    $('.js-alerts').append(
-      `<div class="alert alert-${alertClass} alert-dismissible fade show" role="alert">
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-        <span>${text}</span>
-      </div>`
-    );
-  },
 
   onPropsGivenEvent: function(err, result) {
     App.refreshPropsCount();
@@ -74,20 +87,6 @@ window.App = {
       description: result.args.description
     });
   },
-
-  //initializeProps: function() {
-    //Props.deployed().then(function(instance) {
-      //return instance.getPropsCount.call().then(function(count) {
-        //for (let i = 0; i < count; i++) {
-          //instance.getProps.call(i).then(function(fetched) {
-            //App.appendProps({
-              //from: fetched[0], to: fetched[1], description: fetched[2]
-            //});
-          //});
-        //}
-      //});
-    //});
-  //},
 
   appendProps: function(props) {
     $('.js-all-props').prepend(
@@ -102,6 +101,19 @@ window.App = {
   }
 };
 
+window.Alerts = {
+  display: function(alertClass, text) {
+    $('.js-alerts').append(
+      `<div class="alert alert-${alertClass} alert-dismissible fade show" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <span>${text}</span>
+      </div>`
+    );
+  }
+}
+
 $(function() {
   // Checking if Web3 has been injected by the browser (Mist/MetaMask)
   //if (typeof web3 !== 'undefined') {
@@ -112,7 +124,12 @@ $(function() {
   window.web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
   //}
   account = window.web3.eth.accounts[0];
+  Props.setProvider(web3.currentProvider);
 
-  App.start();
+  if ($('.js-registration-form').length > 0) {
+    Registration.start();
+  } else {
+    App.start();
+  }
 });
 

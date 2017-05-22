@@ -5,8 +5,8 @@ module.exports = function(done) {
 
   Props.deployed().then(function(instance) {
     return Promise.all([
-      instance.register(user1, web3.eth.accounts[0]),
-      instance.register(user2, web3.eth.accounts[1])
+      instance.register(user1),
+      instance.register(user2, {from: web3.eth.accounts[1]})
     ]).then(function() {
       return instance.giveProps(user1, user2, 'test props here');
     }).then(function() {

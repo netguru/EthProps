@@ -17,10 +17,10 @@ contract Props {
     function Props() {
     }
 
-    function register(string email, address account) {
-        if (userExists(email))
+    function register(string username) {
+        if (userExists(username))
             throw;
-        users[email] = account;
+        users[username] = msg.sender;
     }
 
     function giveProps(string from, string to, string description) {
@@ -34,14 +34,14 @@ contract Props {
         PropsGiven(from, to, description);
     }
 
-    function userExists(string email) constant returns (bool) {
-        if (users[email] == 0)
+    function userExists(string username) constant returns (bool) {
+        if (users[username] == 0)
             return false;
         return true;
     }
 
-    function getAccount(string email) constant returns (address) {
-        return users[email];
+    function getAccount(string username) constant returns (address) {
+        return users[username];
     }
 
     function getPropsCount() constant returns (uint) {
