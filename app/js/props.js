@@ -15,7 +15,7 @@ window.Registration = {
     event.preventDefault();
     let username = $('.js-username').val();
     Props.deployed().then(function(instance) {
-      return instance.register(username, account, {from: account});
+      return instance.register(username, {from: account});
     }).then(Registration.onSuccess).catch(Registration.onFail);
   },
 
@@ -33,8 +33,19 @@ window.Registration = {
 window.App = {
   start: function() {
     $('.js-props-form').on('submit', App.onFormSubmit);
+    App.initializeSender();
     App.refreshPropsCount();
     App.initializeProps();
+  },
+
+  initializeSender: function() {
+    let field = $('.js-from');
+    Props.deployed().then(function(instance) {
+      return instance.username.call(account);
+    }).then(function(username) {
+      let value = username == 0 ? 'Unregistered (please register)' : username;
+      field.val(value);
+    });
   },
 
   initializeProps: function() {
@@ -45,7 +56,7 @@ window.App = {
 
   refreshPropsCount: function() {
     Props.deployed().then(function(instance) {
-      return instance.getPropsCount.call();
+      return instance.propsCount.call();
     }).then(function(count) {
       App.setPropsCount(count.toString());
     });
@@ -57,27 +68,27 @@ window.App = {
 
   onFormSubmit: function(event) {
     event.preventDefault();
-    let from = $('.js-from').val();
     let to = $('.js-to').val();
     let description = $('.js-description').val();
-    App.giveProps(from, to, description);
+    App.giveProps(to, description);
   },
 
-  giveProps: function(from, to, description) {
+  giveProps: function(to, description) {
     Props.deployed().then(function(instance) {
-      return instance.giveProps(from, to, description, {from: account, gas: 100000});
+      return instance.giveProps(to, description, {from: account, gas: 100000});
     }).then(App.onPropsGiven).catch(App.onPropsFailed);
   },
 
   onPropsGiven: function() {
     Alerts.display('success', 'Props given!');
+    $('.js-to').val('');
+    $('.js-description').val('');
   },
 
   onPropsFailed: function(err) {
     console.error(err);
     Alerts.display('danger', 'Props failed, try again');
   },
-
 
   onPropsGivenEvent: function(err, result) {
     App.refreshPropsCount();
