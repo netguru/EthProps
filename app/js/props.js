@@ -16,7 +16,9 @@ window.Registration = {
     let username = $('.js-username').val()
     Props.deployed().then(function (instance) {
       return instance.register(username, { from: account })
-    }).then(Registration.onSuccess).catch(Registration.onFail)
+    }).then(Registration.onSuccess).catch(function (err) {
+      Registration.onFail(err, username)
+    })
   },
 
   onSuccess: function () {
@@ -24,9 +26,23 @@ window.Registration = {
     $('.js-username').val('')
   },
 
-  onFail: function (err) {
-    console.log(err)
-    Alerts.display('danger', 'Registration failed, try again (username taken?)')
+  onFail: function (err, username) {
+    Props.deployed().then(function (instance) {
+      instance.userExists.call(username).then(function (userExists) {
+        if (userExists) {
+          Alerts.display('danger', 'Username already registered')
+        } else {
+          return instance.accountExists.call(account).then(function (accountExists) {
+            if (accountExists) {
+              Alerts.display('danger', 'Account address already registered')
+            } else {
+              console.log(err)
+              Alerts.display('danger', 'Registration failed')
+            }
+          })
+        }
+      })
+    })
   }
 }
 

@@ -137,8 +137,14 @@
       "links": {},
       "address": "0xb911902110bb6f2cf5a1938d51475b9537d360c4",
       "updated_at": 1495526031526
+    },
+    "1495534321698": {
+      "events": {},
+      "links": {},
+      "address": "0xda9d029ea86dbb31466a1d53a0a587e0503a3bc5",
+      "updated_at": 1495534360675
     }
   },
   "schema_version": "0.0.5",
-  "updated_at": 1495533859028
+  "updated_at": 1495534360675
 }

@@ -350,8 +350,37 @@
       "links": {},
       "address": "0xef7a98cba708da66a9722e556f598af778640f57",
       "updated_at": 1495526031523
+    },
+    "1495534321698": {
+      "events": {
+        "0x9ca0c39a58d0261129611126690f6b3ca68fe4222086acc16bc92e39809785ec": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "name": "from",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "name": "to",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "name": "description",
+              "type": "string"
+            }
+          ],
+          "name": "PropsGiven",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0x3f77fb62c83308f825b30df7dd78777289d0c7b7",
+      "updated_at": 1495534360676
     }
   },
   "schema_version": "0.0.5",
-  "updated_at": 1495533859024
+  "updated_at": 1495534360676
 }
