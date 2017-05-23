@@ -13,12 +13,20 @@ window.Registration = {
 
   onFormSubmit: function (event) {
     event.preventDefault()
+    Registration.toggleLoader()
     let username = $('.js-username').val()
     Props.deployed().then(function (instance) {
       return instance.register(username, { from: account })
     }).then(Registration.onSuccess).catch(function (err) {
       Registration.onFail(err, username)
+    }).then(function() {
+      Registration.toggleLoader()
     })
+  },
+
+  toggleLoader: function() {
+    $('.js-spinner').toggleClass('hidden-xs-up')
+    $('.js-registration-form').toggleClass('hidden-xs-up')
   },
 
   onSuccess: function () {
@@ -102,6 +110,7 @@ window.App = {
 
   onFormSubmit: function (event) {
     event.preventDefault()
+    App.toggleLoader()
     let to = $('.js-to').val()
     let description = $('.js-description').val()
     App.giveProps(to, description)
@@ -113,7 +122,12 @@ window.App = {
       return instance.giveProps(to, description, { from: account, gas: 100000 })
     }).then(App.onPropsGiven).catch(function (err) {
       App.onPropsFailed(err, from, to)
-    })
+    }).then(App.toggleLoader)
+  },
+
+  toggleLoader: function() {
+    $('.js-spinner').toggleClass('hidden-xs-up')
+    $('.js-props-form').toggleClass('hidden-xs-up')
   },
 
   onPropsGiven: function () {
