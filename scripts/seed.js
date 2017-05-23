@@ -1,7 +1,7 @@
 module.exports = function (done) {
-  var Props = artifacts.require('./Props.sol')
-  var user1 = 'user1'
-  var user2 = 'user2'
+  let Props = artifacts.require('./Props.sol')
+  let user1 = 'user1'
+  let user2 = 'user2'
 
   Props.deployed().then(function (instance) {
     return Promise.all([
