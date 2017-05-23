@@ -70,10 +70,15 @@ window.App = {
   initializeSender: function () {
     let field = $('.js-from')
     Props.deployed().then(function (instance) {
-      return instance.username.call(account)
-    }).then(function (username) {
-      let value = username === 0 ? 'Unregistered (please register)' : username
-      field.val(value)
+      instance.accountExists.call(account).then(function (exists) {
+        if (!exists) {
+          field.val('Unregistered (please register)')
+          return
+        }
+        instance.username.call(account).then(function (username) {
+          field.val(username)
+        })
+      })
     })
   },
 
