@@ -28,20 +28,33 @@ window.Registration = {
 
   onFail: function (err, username) {
     Props.deployed().then(function (instance) {
-      instance.userExists.call(username).then(function (userExists) {
-        if (userExists) {
-          Alerts.display('danger', 'Username already registered')
-        } else {
-          return instance.accountExists.call(account).then(function (accountExists) {
-            if (accountExists) {
-              Alerts.display('danger', 'Account address already registered')
-            } else {
-              console.log(err)
-              Alerts.display('danger', 'Registration failed')
-            }
-          })
-        }
+      Promise.all([
+        Registration.validateUsername(instance, username),
+        Registration.validateAccount(instance)
+      ]).then(function (values) {
+        if (values[0] || values[1])
+          return
+        console.error(err)
+        Alerts.display('danger', 'Registration failed, try again')
       })
+    })
+  },
+
+  validateUsername: function (instance, username) {
+    return instance.userExists.call(username).then(function (exists) {
+      if (exists) {
+        Alerts.display('danger', 'Username already registered')
+        return true
+      }
+    })
+  },
+
+  validateAccount: function (instance) {
+    return instance.accountExists.call(account).then(function (exists) {
+      if (exists) {
+        Alerts.display('danger', 'Account address already registered')
+        return true;
+      }
     })
   }
 }
@@ -90,9 +103,12 @@ window.App = {
   },
 
   giveProps: function (to, description) {
+    let from = $('.js-from').val()
     Props.deployed().then(function (instance) {
       return instance.giveProps(to, description, { from: account, gas: 100000 })
-    }).then(App.onPropsGiven).catch(App.onPropsFailed)
+    }).then(App.onPropsGiven).catch(function (err) {
+      App.onPropsFailed(err, from, to)
+    })
   },
 
   onPropsGiven: function () {
@@ -101,9 +117,44 @@ window.App = {
     $('.js-description').val('')
   },
 
-  onPropsFailed: function (err) {
-    console.error(err)
-    Alerts.display('danger', 'Props failed, try again')
+  onPropsFailed: function (err, from, to) {
+    Props.deployed().then(function (instance) {
+      Promise.all([
+        App.validateSender(instance, from), App.validateReceiver(instance, to), App.validateOwnProps(from, to)
+      ]).then(function (values) {
+        if (values[0] || values[1] || values[2])
+          return
+        console.error(err)
+        Alerts.display('danger', 'Props failed, try again')
+      })
+    })
+  },
+
+  validateSender: function (instance, from) {
+    return instance.userExists.call(from).then(function (userExists) {
+      if (!userExists) {
+        Alerts.display('danger', 'Sender does not exist')
+        return true;
+      }
+    })
+  },
+
+  validateReceiver: function (instance, to) {
+    return instance.userExists.call(to).then(function (userExists) {
+      if (!userExists) {
+        Alerts.display('danger', 'Receiver does not exist')
+        return true;
+      }
+    })
+  },
+
+  validateOwnProps: function (from, to) {
+    return new Promise(function () {
+      if (from === to) {
+        Alerts.display('danger', 'You cannot send props to yourself :c')
+        return true;
+      }
+    })
   },
 
   onPropsGivenEvent: function (_err, result) {
