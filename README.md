@@ -1,5 +1,5 @@
 # EthProps
-Ethereum implementation of props app.
+Ethereum implementation of props app. Currently working on the Rinkeby test network.
 
 ## How to use
 1. Install [MetaMask Chrome Plugin](https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en)
