@@ -17,5 +17,4 @@ Ethereum implementation of props app. Currently working on the Rinkeby test netw
 ## TODO
 * Possibility to attach some coins to given props
 * Possibility to check coins balance and withdraw funds
-* Listing all registered users
 * Tests in .sol language
