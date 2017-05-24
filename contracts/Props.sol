@@ -14,6 +14,7 @@ contract Props {
     uint public propsCount;
 
     event PropsGiven(string from, string to, string description);
+    event UserRegistered(string username);
 
     function Props() {
     }
@@ -23,6 +24,7 @@ contract Props {
             throw;
         usernames[msg.sender] = username;
         accounts[username] = msg.sender;
+        UserRegistered(username);
     }
 
     function giveProps(string to, string description) {

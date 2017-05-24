@@ -72,4 +72,33 @@ contract('Props', function (accounts) {
       })
     })
   })
+
+  describe('UserRegistered event', function () {
+    let firstUser = 'first@test.com'
+    let secondUser = 'second@test.com'
+
+    beforeEach(function () {
+      return Promise.all([
+        instance.register(firstUser),
+        instance.register(secondUser, { from: accounts[1] })
+      ])
+    })
+
+    it('returns list of all registered users', function (done) {
+      this.timeout(1000)
+      let filter = instance.UserRegistered({}, { fromBlock: 0, toBlock: 'latest' })
+      let eventsFired = 0
+      let usernames = []
+      filter.watch(function (_error, results) {
+        usernames.push(results.args.username.toString())
+        eventsFired += 1
+        if (eventsFired === 2) {
+          assert.equal(usernames[0], firstUser)
+          assert.equal(usernames[1], secondUser)
+          filter.stopWatching()
+          done()
+        }
+      })
+    })
+  })
 })
