@@ -6,6 +6,46 @@ import propsArtifacts from '../../build/contracts/Props.json'
 let Props = contract(propsArtifacts)
 let account
 
+window.Withdraw = {
+  start: function () {
+    Withdraw.refreshBalance()
+    $('.js-withdraw-button').on('click', Withdraw.onWithdrawClick)
+  },
+
+  refreshBalance: function () {
+    Props.deployed().then(function (instance) {
+      return instance.userBalance.call()
+    }).then(function (balance) {
+      let ether = web3.fromWei(balance, 'ether')
+      $('.js-ether-balance').text(ether)
+    })
+  },
+
+  onWithdrawClick: function () {
+    Withdraw.toggleLoader()
+    Props.deployed().then(function (instance) {
+      return instance.withdrawPayments({ from: account })
+    }).then(Withdraw.onSuccess).catch(Withdraw.onFail).then(function () {
+      Withdraw.toggleLoader()
+    })
+  },
+
+  onSuccess: function () {
+    Alerts.display('success', 'Withdraw successful')
+    Withdraw.refreshBalance()
+  },
+
+  onFail: function (err, username) {
+    Alerts.display('danger', 'Withdraw failed')
+    console.error(err)
+  },
+
+  toggleLoader: function () {
+    $('.js-spinner').toggleClass('hidden-xs-up')
+    $('.js-withdraw-form').toggleClass('hidden-xs-up')
+  }
+}
+
 window.Registration = {
   start: function () {
     $('.js-registration-form').on('submit', Registration.onFormSubmit)
@@ -19,12 +59,12 @@ window.Registration = {
       return instance.register(username, { from: account })
     }).then(Registration.onSuccess).catch(function (err) {
       Registration.onFail(err, username)
-    }).then(function() {
+    }).then(function () {
       Registration.toggleLoader()
     })
   },
 
-  toggleLoader: function() {
+  toggleLoader: function () {
     $('.js-spinner').toggleClass('hidden-xs-up')
     $('.js-registration-form').toggleClass('hidden-xs-up')
   },
@@ -40,8 +80,9 @@ window.Registration = {
         Registration.validateUsername(instance, username),
         Registration.validateAccount(instance)
       ]).then(function (values) {
-        if (values[0] || values[1])
+        if (values[0] || values[1]) {
           return
+        }
         console.error(err)
         Alerts.display('danger', 'Registration failed, try again')
       })
@@ -61,7 +102,7 @@ window.Registration = {
     return instance.accountExists.call(account).then(function (exists) {
       if (exists) {
         Alerts.display('danger', 'Account address already registered')
-        return true;
+        return true
       }
     })
   }
@@ -133,7 +174,7 @@ window.App = {
     }).then(App.toggleLoader)
   },
 
-  toggleLoader: function() {
+  toggleLoader: function () {
     $('.js-spinner').toggleClass('hidden-xs-up')
     $('.js-props-form').toggleClass('hidden-xs-up')
   },
@@ -150,8 +191,9 @@ window.App = {
       Promise.all([
         App.validateSender(instance, from), App.validateReceiver(instance, to), App.validateOwnProps(from, to)
       ]).then(function (values) {
-        if (values[0] || values[1] || values[2])
+        if (values[0] || values[1] || values[2]) {
           return
+        }
         console.error(err)
         Alerts.display('danger', 'Props failed, try again')
       })
@@ -162,7 +204,7 @@ window.App = {
     return instance.userExists.call(from).then(function (userExists) {
       if (!userExists) {
         Alerts.display('danger', 'Sender does not exist')
-        return true;
+        return true
       }
     })
   },
@@ -171,7 +213,7 @@ window.App = {
     return instance.userExists.call(to).then(function (userExists) {
       if (!userExists) {
         Alerts.display('danger', 'Receiver does not exist')
-        return true;
+        return true
       }
     })
   },
@@ -180,7 +222,7 @@ window.App = {
     return new Promise(function () {
       if (from === to) {
         Alerts.display('danger', 'You cannot send props to yourself :c')
-        return true;
+        return true
       }
     })
   },
@@ -201,8 +243,10 @@ window.App = {
 
   appendProps: function (props) {
     let etherPart = ''
-    if (props.ether > 0)
-      etherPart = `<div><span>Ether: ${props.ether} <i class="fa fa-circle text-warning" aria-hidden="true"></i></span></div>`
+    if (props.ether > 0) {
+      etherPart =
+        `<div><span>Ether: ${props.ether} <i class="fa fa-circle text-warning" aria-hidden="true"></i></span></div>`
+    }
     $('.js-all-props').prepend(
       `<div class="card">
          <div class="card-block">
@@ -230,9 +274,9 @@ window.Alerts = {
 }
 
 $(function () {
-   //Checking if Web3 has been injected by the browser (Mist/MetaMask)
+  // Checking if Web3 has been injected by the browser (Mist/MetaMask)
   if (typeof web3 !== 'undefined') {
-    console.log("Using web3 detected from external source.")
+    console.log('Using web3 detected from external source.')
     window.web3 = new Web3(web3.currentProvider)
   } else {
     console.warn('No web3 detected. Falling back to http://localhost:8545.')
@@ -243,6 +287,8 @@ $(function () {
 
   if ($('.js-registration-form').length > 0) {
     Registration.start()
+  } else if ($('.js-withdraw-form').length > 0) {
+    Withdraw.start()
   } else {
     App.start()
   }
