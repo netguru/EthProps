@@ -212,14 +212,14 @@ window.Alerts = {
 }
 
 $(function () {
-  // Checking if Web3 has been injected by the browser (Mist/MetaMask)
-  // if (typeof web3 !== 'undefined') {
-  // console.log("Using web3 detected from external source.")
-  // window.web3 = new Web3(web3.currentProvider)
-  // } else {
-  console.warn('No web3 detected. Falling back to http://localhost:8545.')
-  window.web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
-  // }
+   //Checking if Web3 has been injected by the browser (Mist/MetaMask)
+  if (typeof web3 !== 'undefined') {
+    console.log("Using web3 detected from external source.")
+    window.web3 = new Web3(web3.currentProvider)
+  } else {
+    console.warn('No web3 detected. Falling back to http://localhost:8545.')
+    window.web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
+  }
   account = window.web3.eth.accounts[0]
   Props.setProvider(web3.currentProvider)
 
