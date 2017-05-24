@@ -70,9 +70,16 @@ window.Registration = {
 window.App = {
   start: function () {
     $('.js-props-form').on('submit', App.onFormSubmit)
+    App.initializeToSelect()
     App.initializeSender()
     App.refreshPropsCount()
     App.initializeProps()
+  },
+
+  initializeToSelect: function () {
+    Props.deployed().then(function (instance) {
+      instance.UserRegistered({}, { fromBlock: '0', toBlock: 'latest' }).watch(App.onUserRegisteredEvent)
+    })
   },
 
   initializeSender: function () {
@@ -183,6 +190,10 @@ window.App = {
       to: result.args.to,
       description: result.args.description
     })
+  },
+
+  onUserRegisteredEvent: function (_err, result) {
+    $('.js-to').prepend(`<option>${result.args.username}</option>`)
   },
 
   appendProps: function (props) {
