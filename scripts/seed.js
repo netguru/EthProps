@@ -8,7 +8,7 @@ module.exports = function (done) {
       instance.register(user1),
       instance.register(user2, { from: web3.eth.accounts[1] })
     ]).then(function () {
-      return instance.giveProps(user2, 'test props here')
+      return instance.giveProps(user2, 'test props here', { value: web3.toWei(3, 'ether') })
     }).then(function () {
       console.log('Seeds done')
       done()

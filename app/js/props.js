@@ -125,8 +125,9 @@ window.App = {
 
   giveProps: function (to, description) {
     let from = $('.js-from').val()
+    let ether = $('.js-attached-ether').val()
     Props.deployed().then(function (instance) {
-      return instance.giveProps(to, description, { from: account, gas: 100000 })
+      return instance.giveProps(to, description, { from: account, value: web3.toWei(ether, 'ether'), gas: 100000 })
     }).then(App.onPropsGiven).catch(function (err) {
       App.onPropsFailed(err, from, to)
     }).then(App.toggleLoader)
@@ -141,6 +142,7 @@ window.App = {
     Alerts.display('success', 'Props given!')
     $('.js-to').val('')
     $('.js-description').val('')
+    $('.js-attached-ether').val('')
   },
 
   onPropsFailed: function (err, from, to) {
@@ -188,7 +190,8 @@ window.App = {
     App.appendProps({
       from: result.args.from,
       to: result.args.to,
-      description: result.args.description
+      description: result.args.description,
+      ether: web3.fromWei(result.args.sentWei, 'ether')
     })
   },
 
@@ -197,12 +200,16 @@ window.App = {
   },
 
   appendProps: function (props) {
+    let etherPart = ''
+    if (props.ether > 0)
+      etherPart = `<div><span>Ether: ${props.ether} <i class="fa fa-circle text-warning" aria-hidden="true"></i></span></div>`
     $('.js-all-props').prepend(
       `<div class="card">
          <div class="card-block">
            <div><span>From: ${props.from}</span></div>
            <div><span>To: ${props.to}</span></div>
            <div><span>Description: ${props.description}</span></div>
+           ${etherPart}
          </div>
        </div>`
     )

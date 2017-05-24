@@ -1,7 +1,10 @@
 pragma solidity ^0.4.11;
 
 
-contract Props {
+import "zeppelin-solidity/contracts/payment/PullPayment.sol";
+
+
+contract Props is PullPayment {
 
     struct GivenProps {
         string from;
@@ -13,7 +16,7 @@ contract Props {
     mapping (string => address) accounts;
     uint public propsCount;
 
-    event PropsGiven(string from, string to, string description);
+    event PropsGiven(string from, string to, string description, uint sentWei);
     event UserRegistered(string username);
 
     function Props() {
@@ -27,11 +30,18 @@ contract Props {
         UserRegistered(username);
     }
 
-    function giveProps(string to, string description) {
+    function giveProps(string to, string description) payable {
         string from = usernames[msg.sender];
+        uint sentWei = msg.value;
         if (!userExists(from) || !userExists(to) || sha3(from) == sha3(to))
             throw;
-        PropsGiven(from, to, description);
+        asyncSend(accounts[to], sentWei);
+        PropsGiven(
+            from,
+            to,
+            description,
+            sentWei
+        );
         propsCount++;
     }
 
@@ -53,5 +63,9 @@ contract Props {
 
     function username(address account) constant returns (string) {
         return usernames[account];
+    }
+
+    function userBalance() constant returns (uint) {
+        return payments[msg.sender];
     }
 }
