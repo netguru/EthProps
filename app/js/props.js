@@ -24,8 +24,8 @@ window.Withdraw = {
   onWithdrawClick: function () {
     Withdraw.toggleLoader()
     Props.deployed().then(function (instance) {
-      return instance.withdrawPayments({ from: coinbase, gas: 30000 })
-    }).then(Withdraw.onSuccess).catch(Withdraw.onFail).then(function () {
+      return instance.withdrawPayments({ from: coinbase, gas: 50000 })
+    }).then(OutOfGas.check).then(Withdraw.onSuccess).catch(Withdraw.onFail).then(function () {
       Withdraw.toggleLoader()
     })
   },
@@ -271,11 +271,14 @@ window.App = {
 
 window.OutOfGas = {
   check: function (txId) {
-    web3.eth.getTransaction(txId.tx, function (_error, tx) {
-      web3.eth.getTransactionReceipt(txId.tx, function (_error, txr) {
-        if (txr.gasUsed == tx.gas) {
-          throw new Error('All gas used')
-        }
+    return new Promise(function (resolve, reject) {
+      web3.eth.getTransaction(txId.tx, function (_error, tx) {
+        web3.eth.getTransactionReceipt(txId.tx, function (_error, txr) {
+          if (txr.gasUsed == tx.gas) {
+            reject('All gas used')
+          }
+          resolve()
+        })
       })
     })
   }
