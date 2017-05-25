@@ -266,11 +266,50 @@
           ],
           "name": "PropsGiven",
           "type": "event"
+        },
+        "0x9f5e5cbab434069ae93195a09e9d547fd4978a7fe2b8724bb2a32c85643bd14a": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "name": "from",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "name": "to",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "name": "description",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "name": "sentWei",
+              "type": "uint256"
+            }
+          ],
+          "name": "PropsGiven",
+          "type": "event"
+        },
+        "0x270ff4b111e5baa49283562af127cc5ea74e9d6c9efd5465578bd9223d5843f0": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "name": "username",
+              "type": "string"
+            }
+          ],
+          "name": "UserRegistered",
+          "type": "event"
         }
       },
       "links": {},
-      "address": "0x8cd61b1f184adcd4d38947ca7e446175169a2b68",
-      "updated_at": 1495613318878
+      "address": "0x3b62babbfea7e99aee24a6b5f6664b59069d0778",
+      "updated_at": 1495635083700
     },
     "1495002855554": {
       "events": {},
@@ -594,5 +633,5 @@
     }
   },
   "schema_version": "0.0.5",
-  "updated_at": 1495634056561
+  "updated_at": 1495635083700
 }
