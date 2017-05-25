@@ -78,10 +78,9 @@ contract('Props', function (accounts) {
     let secondUser = 'second@test.com'
 
     beforeEach(function () {
-      return Promise.all([
-        instance.register(firstUser),
-        instance.register(secondUser, { from: accounts[1] })
-      ])
+      return instance.register(firstUser).then(function () {
+        return instance.register(secondUser, { from: accounts[1] })
+      })
     })
 
     it('returns list of all registered users', function (done) {

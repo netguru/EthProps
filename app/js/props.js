@@ -4,7 +4,7 @@ import { default as contract } from 'truffle-contract'
 import propsArtifacts from '../../build/contracts/Props.json'
 
 let Props = contract(propsArtifacts)
-let account
+let coinbase
 
 window.Withdraw = {
   start: function () {
@@ -14,7 +14,7 @@ window.Withdraw = {
 
   refreshBalance: function () {
     Props.deployed().then(function (instance) {
-      return instance.userBalance.call()
+      return instance.userBalance.call({ from: coinbase })
     }).then(function (balance) {
       let ether = web3.fromWei(balance, 'ether')
       $('.js-ether-balance').text(ether)
@@ -24,7 +24,7 @@ window.Withdraw = {
   onWithdrawClick: function () {
     Withdraw.toggleLoader()
     Props.deployed().then(function (instance) {
-      return instance.withdrawPayments({ from: account })
+      return instance.withdrawPayments({ from: coinbase, gas: 100000 })
     }).then(Withdraw.onSuccess).catch(Withdraw.onFail).then(function () {
       Withdraw.toggleLoader()
     })
@@ -56,7 +56,7 @@ window.Registration = {
     Registration.toggleLoader()
     let username = $('.js-username').val()
     Props.deployed().then(function (instance) {
-      return instance.register(username, { from: account })
+      return instance.register(username, { from: coinbase })
     }).then(Registration.onSuccess).catch(function (err) {
       Registration.onFail(err, username)
     }).then(function () {
@@ -90,7 +90,7 @@ window.Registration = {
   },
 
   validateUsername: function (instance, username) {
-    return instance.userExists.call(username).then(function (exists) {
+    return instance.userExists.call(username, { from: coinbase }).then(function (exists) {
       if (exists) {
         Alerts.display('danger', 'Username already registered')
         return true
@@ -99,7 +99,7 @@ window.Registration = {
   },
 
   validateAccount: function (instance) {
-    return instance.accountExists.call(account).then(function (exists) {
+    return instance.accountExists.call(coinbase, { from: coinbase }).then(function (exists) {
       if (exists) {
         Alerts.display('danger', 'Account address already registered')
         return true
@@ -126,12 +126,12 @@ window.App = {
   initializeSender: function () {
     let field = $('.js-from')
     Props.deployed().then(function (instance) {
-      instance.accountExists.call(account).then(function (exists) {
+      instance.accountExists.call(coinbase, { from: coinbase }).then(function (exists) {
         if (!exists) {
           field.val('Unregistered (please register)')
           return
         }
-        instance.username.call(account).then(function (username) {
+        instance.username.call(coinbase, { from: coinbase }).then(function (username) {
           field.val(username)
         })
       })
@@ -146,7 +146,7 @@ window.App = {
 
   refreshPropsCount: function () {
     Props.deployed().then(function (instance) {
-      return instance.propsCount.call()
+      return instance.propsCount.call({ from: coinbase })
     }).then(function (count) {
       App.setPropsCount(count.toString())
     })
@@ -168,7 +168,7 @@ window.App = {
     let from = $('.js-from').val()
     let ether = $('.js-attached-ether').val()
     Props.deployed().then(function (instance) {
-      return instance.giveProps(to, description, { from: account, value: web3.toWei(ether, 'ether'), gas: 100000 })
+      return instance.giveProps(to, description, { from: coinbase, value: web3.toWei(ether, 'ether'), gas: 100000 })
     }).then(App.onPropsGiven).catch(function (err) {
       App.onPropsFailed(err, from, to)
     }).then(App.toggleLoader)
@@ -201,7 +201,7 @@ window.App = {
   },
 
   validateSender: function (instance, from) {
-    return instance.userExists.call(from).then(function (userExists) {
+    return instance.userExists.call(from, { from: coinbase }).then(function (userExists) {
       if (!userExists) {
         Alerts.display('danger', 'Sender does not exist')
         return true
@@ -210,7 +210,7 @@ window.App = {
   },
 
   validateReceiver: function (instance, to) {
-    return instance.userExists.call(to).then(function (userExists) {
+    return instance.userExists.call(to, { from: coinbase }).then(function (userExists) {
       if (!userExists) {
         Alerts.display('danger', 'Receiver does not exist')
         return true
@@ -282,7 +282,7 @@ $(function () {
     console.warn('No web3 detected. Falling back to http://localhost:8545.')
     window.web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
   }
-  account = window.web3.eth.accounts[0]
+  coinbase = window.web3.eth.coinbase
   Props.setProvider(web3.currentProvider)
 
   if ($('.js-registration-form').length > 0) {

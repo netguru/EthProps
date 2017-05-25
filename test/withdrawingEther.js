@@ -2,18 +2,13 @@ let Props = artifacts.require('./Props.sol')
 
 contract('Props', function (accounts) {
   let instance
+  let firstUser = 'first@test.com'
+  let secondUser = 'second@test.com'
 
   beforeEach(function () {
     return Props.new().then(function (_instance) {
       instance = _instance
-    })
-  })
-
-  describe('withdraw', function () {
-    let firstUser = 'first@test.com'
-    let secondUser = 'second@test.com'
-
-    beforeEach(function () {
+    }).then(function () {
       return Promise.all([
         instance.register(firstUser),
         instance.register(secondUser, { from: accounts[1] })
@@ -21,7 +16,9 @@ contract('Props', function (accounts) {
         return instance.giveProps(firstUser, 'first props', { from: accounts[1], value: web3.toWei(3, 'ether') })
       })
     })
+  })
 
+  describe('withdraw', function () {
     it('raises user account balance on ethereum network', function () {
       let balanceBefore = web3.eth.getBalance(accounts[0])
       return instance.withdrawPayments().then(function () {
@@ -42,6 +39,27 @@ contract('Props', function (accounts) {
         return instance.userBalance()
       }).then(function (balance) {
         assert.equal(balance, 0)
+      })
+    })
+  })
+
+  describe('userBalance', function () {
+    it('returns user balance for given account', function () {
+      return instance.userBalance({ from: accounts[0] }).then(function (balance) {
+        let etherBalance = web3.fromWei(balance.toString(), 'ether')
+        assert.equal(etherBalance, '3')
+      })
+    })
+
+    it('returns 0 if account does NOT exist', function () {
+      return instance.userBalance({ from: '0x9045447c50795d34785b846b019dbf3a75dcd071' }).then(function (balance) {
+        assert.equal(balance, '0')
+      })
+    })
+
+    it('returns 0 if account is account is empty', function () {
+      return instance.userBalance({ from: web3.eth.accounts[2] }).then(function (balance) {
+        assert.equal(balance.toString(), '0')
       })
     })
   })

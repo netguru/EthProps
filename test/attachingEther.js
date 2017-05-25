@@ -31,6 +31,24 @@ contract('Props', function (accounts) {
       })
     })
 
+    it('does NOT raise other user account balance', function () {
+      return instance.userBalance().then(function (balance) {
+        assert.equal(balance.toString(), '0')
+        return instance.userBalance({from: accounts[1]})
+      }).then(function (balance) {
+        assert.equal(balance.toString(), '0')
+        return instance.giveProps(firstUser, 'first props', { from: accounts[1], value: web3.toWei(3, 'ether') })
+      }).then(function () {
+        return instance.userBalance()
+      }).then(function (balance) {
+        let balanceString = balance.toString()
+        assert.equal(web3.fromWei(balanceString, 'ether'), '3')
+        return instance.userBalance({from: accounts[1]})
+      }).then(function (balance) {
+        assert.equal(balance.toString(), '0')
+      })
+    })
+
     it('emits a PropsGiven event with attached ether value', function (done) {
       this.timeout(1000)
       instance.giveProps(secondUser, 'test', { value: web3.toWei(5, 'ether') }).then(function () {
