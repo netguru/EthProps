@@ -53,14 +53,20 @@ window.Registration = {
 
   onFormSubmit: function (event) {
     event.preventDefault()
-    Registration.toggleLoader()
     let username = $('.js-username').val()
-    Props.deployed().then(function (instance) {
+    Registration.toggleLoader()
+    Registration.validate(username).then(function (valid) {
+      if (valid) {
+        return Registration.doRegister(username)
+      }
+    }).then(Registration.toggleLoader)
+  },
+
+  doRegister: function (username) {
+    return Props.deployed().then(function (instance) {
       return instance.register(username, { from: coinbase, gas: 80000 })
-    }).then(Registration.onSuccess).catch(function (err) {
+    }).then(OutOfGas.check).then(Registration.onSuccess).catch(function (err) {
       Registration.onFail(err, username)
-    }).then(function () {
-      Registration.toggleLoader()
     })
   },
 
@@ -74,27 +80,29 @@ window.Registration = {
     $('.js-username').val('')
   },
 
-  onFail: function (err, username) {
-    Props.deployed().then(function (instance) {
-      Promise.all([
+  validate: function (username) {
+    return Props.deployed().then(function (instance) {
+      return Promise.all([
         Registration.validateUsername(instance, username),
         Registration.validateAccount(instance)
       ]).then(function (values) {
-        if (values[0] || values[1]) {
-          return
-        }
-        console.error(err)
-        Alerts.display('danger', 'Registration failed, try again')
+        return (values[0] && values[1])
       })
     })
+  },
+
+  onFail: function (err, username) {
+    console.error(err)
+    Alerts.display('danger', 'Registration failed, try again')
   },
 
   validateUsername: function (instance, username) {
     return instance.userExists.call(username, { from: coinbase }).then(function (exists) {
       if (exists) {
         Alerts.display('danger', 'Username already registered')
-        return true
+        return false
       }
+      return true
     })
   },
 
@@ -102,8 +110,9 @@ window.Registration = {
     return instance.accountExists.call(coinbase, { from: coinbase }).then(function (exists) {
       if (exists) {
         Alerts.display('danger', 'Account address already registered')
-        return true
+        return false
       }
+      return true
     })
   }
 }
@@ -257,6 +266,18 @@ window.App = {
          </div>
        </div>`
     )
+  }
+}
+
+window.OutOfGas = {
+  check: function (txId) {
+    web3.eth.getTransaction(txId.tx, function (_error, tx) {
+      web3.eth.getTransactionReceipt(txId.tx, function (_error, txr) {
+        if (txr.gasUsed == tx.gas) {
+          throw new Error('All gas used')
+        }
+      })
+    })
   }
 }
 
