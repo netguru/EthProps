@@ -24,7 +24,7 @@ window.Withdraw = {
   onWithdrawClick: function () {
     Withdraw.toggleLoader()
     Props.deployed().then(function (instance) {
-      return instance.withdrawPayments({ from: coinbase, gas: 100000 })
+      return instance.withdrawPayments({ from: coinbase, gas: 30000 })
     }).then(Withdraw.onSuccess).catch(Withdraw.onFail).then(function () {
       Withdraw.toggleLoader()
     })
@@ -56,7 +56,7 @@ window.Registration = {
     Registration.toggleLoader()
     let username = $('.js-username').val()
     Props.deployed().then(function (instance) {
-      return instance.register(username, { from: coinbase })
+      return instance.register(username, { from: coinbase, gas: 80000 })
     }).then(Registration.onSuccess).catch(function (err) {
       Registration.onFail(err, username)
     }).then(function () {
