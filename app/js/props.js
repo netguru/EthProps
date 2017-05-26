@@ -25,9 +25,7 @@ window.Withdraw = {
     Withdraw.toggleLoader()
     Props.deployed().then(function (instance) {
       return instance.withdrawPayments({ from: coinbase, gas: 50000 })
-    }).then(OutOfGas.check).then(Withdraw.onSuccess).catch(Withdraw.onFail).then(function () {
-      Withdraw.toggleLoader()
-    })
+    }).then(OutOfGas.check).then(Withdraw.onSuccess).catch(Withdraw.onFail).then(Withdraw.toggleLoader)
   },
 
   onSuccess: function () {
@@ -35,7 +33,7 @@ window.Withdraw = {
     Withdraw.refreshBalance()
   },
 
-  onFail: function (err, username) {
+  onFail: function (err) {
     Alerts.display('danger', 'Withdraw failed')
     console.error(err)
   },
@@ -65,9 +63,7 @@ window.Registration = {
   doRegister: function (username) {
     return Props.deployed().then(function (instance) {
       return instance.register(username, { from: coinbase, gas: 80000 })
-    }).then(OutOfGas.check).then(Registration.onSuccess).catch(function (err) {
-      Registration.onFail(err, username)
-    })
+    }).then(OutOfGas.check).then(Registration.onSuccess).catch(Registration.onFail)
   },
 
   toggleLoader: function () {
@@ -167,20 +163,26 @@ window.App = {
 
   onFormSubmit: function (event) {
     event.preventDefault()
-    App.toggleLoader()
     let to = $('.js-to').val()
     let description = $('.js-description').val()
-    App.giveProps(to, description)
+    let ether = $('.js-attached-ether').val()
+    App.giveProps(to, description, ether)
   },
 
-  giveProps: function (to, description) {
+  giveProps: function (to, description, ether) {
     let from = $('.js-from').val()
-    let ether = $('.js-attached-ether').val()
-    Props.deployed().then(function (instance) {
-      return instance.giveProps(to, description, { from: coinbase, value: web3.toWei(ether, 'ether'), gas: 100000 })
-    }).then(App.onPropsGiven).catch(function (err) {
-      App.onPropsFailed(err, from, to)
+    App.toggleLoader()
+    App.validate(from, to).then(function (valid) {
+      if (valid) {
+        return App.doGiveProps(to, description, ether)
+      }
     }).then(App.toggleLoader)
+  },
+
+  doGiveProps: function (to, description, ether) {
+    return Props.deployed().then(function (instance) {
+      return instance.giveProps(to, description, { from: coinbase, value: web3.toWei(ether, 'ether'), gas: 100000 })
+    }).then(OutOfGas.check).then(App.onPropsGiven).catch(App.onPropsFailed)
   },
 
   toggleLoader: function () {
@@ -195,16 +197,19 @@ window.App = {
     $('.js-attached-ether').val('')
   },
 
-  onPropsFailed: function (err, from, to) {
-    Props.deployed().then(function (instance) {
-      Promise.all([
-        App.validateSender(instance, from), App.validateReceiver(instance, to), App.validateOwnProps(from, to)
+  onPropsFailed: function (err) {
+    Alerts.display('danger', 'Props failed, try again')
+    console.error(err)
+  },
+
+  validate: function (from, to) {
+    return Props.deployed().then(function (instance) {
+      return Promise.all([
+        App.validateSender(instance, from),
+        App.validateReceiver(instance, to),
+        App.validateOwnProps(from, to)
       ]).then(function (values) {
-        if (values[0] || values[1] || values[2]) {
-          return
-        }
-        console.error(err)
-        Alerts.display('danger', 'Props failed, try again')
+        return (values[0] && values[1] && values[2])
       })
     })
   },
@@ -213,8 +218,9 @@ window.App = {
     return instance.userExists.call(from, { from: coinbase }).then(function (userExists) {
       if (!userExists) {
         Alerts.display('danger', 'Sender does not exist')
-        return true
+        return false
       }
+      return true
     })
   },
 
@@ -222,17 +228,19 @@ window.App = {
     return instance.userExists.call(to, { from: coinbase }).then(function (userExists) {
       if (!userExists) {
         Alerts.display('danger', 'Receiver does not exist')
-        return true
+        return false
       }
+      return true
     })
   },
 
   validateOwnProps: function (from, to) {
-    return new Promise(function () {
+    return new Promise(function (resolve) {
       if (from === to) {
         Alerts.display('danger', 'You cannot send props to yourself :c')
-        return true
+        resolve(false)
       }
+      resolve(true)
     })
   },
 
