@@ -6,7 +6,8 @@ Ethereum implementation of props app. Currently working on the Rinkeby test netw
 2. In MetaMask create new account and switch to the Rinkeby Test Net
 3. Use https://faucet.rinkeby.io/ to get yourself some ether in Rinkeby network
 4. Make sure that your account in MetaMask is unlocked and provide your passphrase if prompted
-5. Visit http://eth-props.surge.sh/
+5. Visit http://eth-props.surge.sh/ or serve it locally (see [How to
+   develop](#how-to-develop))
 6. Go to registration section
 7. Type your username, register and accept the operation in MetaMask popup window
 8. Ask your friend to register and provide you with the username to send your first props!
