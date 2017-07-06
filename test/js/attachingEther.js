@@ -34,7 +34,7 @@ contract('Props', function (accounts) {
     it('does NOT raise other user account balance', function () {
       return instance.userBalance().then(function (balance) {
         assert.equal(balance.toString(), '0')
-        return instance.userBalance({from: accounts[1]})
+        return instance.userBalance({ from: accounts[1] })
       }).then(function (balance) {
         assert.equal(balance.toString(), '0')
         return instance.giveProps(firstUser, 'first props', { from: accounts[1], value: web3.toWei(3, 'ether') })
@@ -43,7 +43,7 @@ contract('Props', function (accounts) {
       }).then(function (balance) {
         let balanceString = balance.toString()
         assert.equal(web3.fromWei(balanceString, 'ether'), '3')
-        return instance.userBalance({from: accounts[1]})
+        return instance.userBalance({ from: accounts[1] })
       }).then(function (balance) {
         assert.equal(balance.toString(), '0')
       })

@@ -281,9 +281,9 @@ window.OutOfGas = {
   check: function (txId) {
     return new Promise(function (resolve, reject) {
       web3.eth.getTransaction(txId.tx, function (_error, tx) {
-        web3.eth.getTransactionReceipt(txId.tx, function (_error, txr) {
-          if (txr.gasUsed == tx.gas) {
-            reject('All gas used')
+        web3.eth.getTransactionReceipt(txId.tx, function (error, txr) {
+          if (txr.gasUsed === tx.gas) {
+            reject(error)
           }
           resolve()
         })
@@ -323,7 +323,7 @@ function onCoinbaseRetrieved (error, result) {
   initializeApp()
 }
 
-window.addEventListener('load', function() {
+window.addEventListener('load', function () {
   window.web3 = new Web3(web3.currentProvider)
   Props.setProvider(web3.currentProvider)
   window.web3.eth.getCoinbase(onCoinbaseRetrieved)
