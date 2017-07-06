@@ -4,9 +4,9 @@ Ethereum implementation of props app. Currently working on the Rinkeby test netw
 ## How to use
 1. Install [MetaMask Chrome Plugin](https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en)
 2. In MetaMask create new account and switch to the Rinkeby Test Net
-3. Use https://faucet.rinkeby.io/ to get yourself some ether in Rinkeby network
+3. Use faucet.rinkeby.io to get yourself some ether in Rinkeby network
 4. Make sure that your account in MetaMask is unlocked and provide your passphrase if prompted
-5. Visit http://eth-props.surge.sh/ or serve it locally (see [How to
+5. Visit eth-props.surge.sh or serve it locally (see [How to
    develop](#how-to-develop))
 6. Go to registration section
 7. Type your username, register and accept the operation in MetaMask popup window
