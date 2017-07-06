@@ -16,3 +16,7 @@ Ethereum implementation of props app. Currently working on the Rinkeby test netw
 1. First run `truffle compile`, then run `truffle migrate` to deploy the contracts onto your network of choice (default "development")
 2. Then run `npm run dev` to build the app and serve it on http://localhost:8080
 3. Run `npm run lint` to lint javascript and solidity files
+
+## How to test
+1. Install and run [testrpc](https://github.com/ethereumjs/testrpc)
+2. Run `truffle test`
