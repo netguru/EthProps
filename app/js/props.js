@@ -245,6 +245,7 @@ window.App = {
   },
 
   onPropsGivenEvent: function (_err, result) {
+    App.ensureLoadingPropsHidden()
     App.refreshPropsCount()
     App.appendProps({
       from: result.args.from,
@@ -254,8 +255,17 @@ window.App = {
     })
   },
 
+  ensureLoadingPropsHidden: function () {
+    $('.js-given-props-spinner.visible').addClass('hidden-xs-up').removeClass('visible')
+  },
+
   onUserRegisteredEvent: function (_err, result) {
+    App.ensureLoadingToHidden()
     $('.js-to').prepend(`<option>${result.args.username}</option>`)
+  },
+
+  ensureLoadingToHidden: function () {
+    $('.js-to option[value=loading]').remove()
   },
 
   appendProps: function (props) {

@@ -32,7 +32,7 @@
       </div>
     </nav>
     <div class="container mt-5">
-      <h1>Send props!</h1>
+      <h1 class="display-3">Send Ethereum props!</h1>
       <div class="js-alerts"></div>
       <form class="js-props-form">
         <div class="form-group">
@@ -41,7 +41,9 @@
         </div>
         <div class="form-group">
           <label for="to">To:</label>
-          <select name="to" class="js-to form-control"></select>
+          <select name="to" class="js-to form-control">
+            <option value="loading" disabled selected>Loading...</option>
+          </select>
         </div>
         <div class="form-group">
           <label for="description">Description:</label>
@@ -60,11 +62,15 @@
     </div>
     <div class="container mt-5">
       <h2>
-        <span>Total props given: </span><span class='js-total-props'></span>
+        <span>Our users gave </span><span class='js-total-props'></span><span> props in total</span><i class="fa fa-hand-peace-o pl-2" aria-hidden="true"></i>
       </h2>
     </div>
     <div class="container my-5">
-      <h2>Given props:</h2>
+      <h2>All given props:</h2>
+      <div class="js-given-props-spinner visible">
+        <i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw"></i>
+        <span class="sr-only">Loading...</span>
+      </div>
       <div class="js-all-props"></div>
     </div>
   </body>
