@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Ethereum version of props app",
   "scripts": {
-    "lint": "eslint ./",
+    "lint": "eslint ./; solium --dir ./",
     "build": "webpack",
     "dev": "webpack-dev-server"
   },
