@@ -305,18 +305,7 @@ window.Alerts = {
   }
 }
 
-$(function () {
-  // Checking if Web3 has been injected by the browser (Mist/MetaMask)
-  if (typeof web3 !== 'undefined') {
-    console.log('Using web3 detected from external source.')
-    window.web3 = new Web3(web3.currentProvider)
-  } else {
-    console.warn('No web3 detected. Falling back to http://localhost:8545.')
-    window.web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
-  }
-  coinbase = window.web3.eth.coinbase
-  Props.setProvider(web3.currentProvider)
-
+function initializeApp () {
   if ($('.js-registration-form').length > 0) {
     Registration.start()
   } else if ($('.js-withdraw-form').length > 0) {
@@ -324,4 +313,18 @@ $(function () {
   } else {
     App.start()
   }
+}
+
+function onCoinbaseRetrieved (error, result) {
+  if (error) {
+    throw error
+  }
+  coinbase = result
+  initializeApp()
+}
+
+window.addEventListener('load', function() {
+  window.web3 = new Web3(web3.currentProvider)
+  Props.setProvider(web3.currentProvider)
+  window.web3.eth.getCoinbase(onCoinbaseRetrieved)
 })
