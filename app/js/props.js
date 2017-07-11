@@ -181,7 +181,7 @@ window.App = {
 
   doGiveProps: function (to, description, ether) {
     return Props.deployed().then(function (instance) {
-      return instance.giveProps(to, description, { from: coinbase, value: web3.toWei(ether, 'ether'), gas: 100000 })
+      return instance.giveProps(to, description, { from: coinbase, value: web3.toWei(ether, 'ether'), gas: 180000 })
     }).then(OutOfGas.check).then(App.onPropsGiven).catch(App.onPropsFailed)
   },
 
