@@ -181,7 +181,7 @@ window.App = {
 
   doGiveProps: function (to, description, ether) {
     return Props.deployed().then(function (instance) {
-      return instance.giveProps(to, description, { from: coinbase, value: web3.toWei(ether, 'ether'), gas: 180000 })
+      return instance.giveProps(to, description, { from: coinbase, value: web3.toWei(ether, 'ether'), gas: 250000 })
     }).then(OutOfGas.check).then(App.onPropsGiven).catch(App.onPropsFailed)
   },
 
@@ -251,6 +251,7 @@ window.App = {
       from: result.args.from,
       to: result.args.to,
       description: result.args.description,
+      sentence: web3.toAscii(result.args.sentence),
       ether: web3.fromWei(result.args.sentWei, 'ether')
     })
   },
@@ -272,15 +273,13 @@ window.App = {
     let etherPart = ''
     if (props.ether > 0) {
       etherPart =
-        `<div><span>Ether: ${props.ether} <i class="fa fa-circle text-warning" aria-hidden="true"></i></span></div>`
+        `<span> and appends <i class="fa fa-circle text-warning" aria-hidden="true"></i> ${props.ether} Ether</span>`
     }
     $('.js-all-props').prepend(
-      `<div class="card">
+      `<div class="card my-3">
          <div class="card-block">
-           <div><span>From: ${props.from}</span></div>
-           <div><span>To: ${props.to}</span></div>
-           <div><span>Description: ${props.description}</span></div>
-           ${etherPart}
+           <div><span>${props.from} ${props.sentence} ${props.to}</span>${etherPart}</div>
+           <blockquote class="blockquote my-2">${props.description}</blockquote>
          </div>
        </div>`
     )
