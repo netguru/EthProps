@@ -16,7 +16,8 @@ contract RandomSentence is usingOraclize {
     ];
 
     function RandomSentence() {
-        OAR = OraclizeAddrResolverI(0xe5b590b15C68641627A8bd48Ea2D5b85cf75a60F);
+        //OAR = OraclizeAddrResolverI(0x6f485C8BF6fc43eA212E93BBF8ce046C7f1cb475);
+        // Uncomment and use proper address when using in development with oraclize ethereum-bridge
         update();
     }
 
