@@ -16,6 +16,8 @@ contract RandomSentence is usingOraclize {
         "is grateful to"
     ];
 
+    event Updated(bytes32 sentence);
+
     function () payable {}
 
     function mockOraclize(address resolverAddress) {
@@ -30,6 +32,7 @@ contract RandomSentence is usingOraclize {
         if (msg.sender != oraclize_cbAddress())
             throw;
         currentSentence = parseInt(result);
+        Updated(get());
     }
 
     // Constant functions (functions that do NOT write to blockchain)
