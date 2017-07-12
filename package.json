@@ -5,7 +5,10 @@
   "scripts": {
     "lint": "eslint ./; solium --dir ./",
     "build": "webpack",
-    "dev": "webpack-dev-server"
+    "dev": "webpack-dev-server",
+    "migreset": "truffle migrate --reset",
+    "seed": "truffle exec scripts/seed.js",
+    "setup": "npm run migreset && npm run seed"
   },
   "license": "MIT",
   "devDependencies": {
