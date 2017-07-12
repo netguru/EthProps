@@ -34,8 +34,8 @@ contract Props is PullPayment {
             throw;
         bytes32 sentence = takeSentence();
         asyncSend(accounts[to], sentWei);
-        PropsGiven(from, to, description, sentWei, sentence);
         propsCount++;
+        PropsGiven(from, to, description, sentWei, sentence);
     }
 
     function takeSentence() private returns (bytes32) {

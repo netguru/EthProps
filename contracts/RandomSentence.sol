@@ -5,23 +5,22 @@ import "./oraclize/usingOraclize.sol";
 
 contract RandomSentence is usingOraclize {
 
-    uint private currentSentence;
+    uint private currentSentence = 0;
 
     bytes32[] private sentences = [
-        bytes32("says thank you to"),
-        "sends props to",
+        bytes32("sends props to"),
+        "says thanks you to",
         "is thankful to",
-        "says thanks",
-        "props"
+        "says thanks to",
+        "props",
+        "is grateful to"
     ];
 
-    function RandomSentence() {
-        //OAR = OraclizeAddrResolverI(0x6f485C8BF6fc43eA212E93BBF8ce046C7f1cb475);
-        // Uncomment and use proper address when using in development with oraclize ethereum-bridge
-        update();
-    }
-
     function () payable {}
+
+    function mockOraclize(address resolverAddress) {
+        OAR = OraclizeAddrResolverI(resolverAddress);
+    }
 
     function update() payable {
         oraclize_query("WolframAlpha", queryContent());
@@ -36,14 +35,14 @@ contract RandomSentence is usingOraclize {
     // Constant functions (functions that do NOT write to blockchain)
 
     function get() constant returns (bytes32) {
-        return sentences[currentSentence - 1];
+        return sentences[currentSentence];
     }
 
-    function sentencesCount() private constant returns (string) {
-        return uint2str(sentences.length);
+    function maxSentence() private constant returns (string) {
+        return uint2str(sentences.length - 1);
     }
 
     function queryContent() private constant returns (string) {
-        return strConcat("random number between 1 and ", sentencesCount());
+        return strConcat("random number between 0 and ", maxSentence());
     }
 }
