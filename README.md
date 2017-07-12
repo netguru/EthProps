@@ -19,6 +19,6 @@ Ethereum implementation of props app. Currently working on the Rinkeby test netw
 
 ## How to test
 1. Install [testrpc](https://github.com/ethereumjs/testrpc) and run `testrpc`
-2. Install [ethereum-bridge]() and run `node bridge -u http://localhost:8545 -a 9`
+2. Install [ethereum-bridge](https://github.com/oraclize/ethereum-bridge) and run `node bridge -u http://localhost:8545 -a 9`
 3. Fill in your bridge contract number in [migration file](https://github.com/filip373/EthProps/blob/master/migrations/2_deploy_contracts.js)
 4. Run `truffle test`
