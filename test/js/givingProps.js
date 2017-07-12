@@ -1,12 +1,17 @@
 let Props = artifacts.require('./Props.sol')
+let FakeRandomSentence = artifacts.require('./FakeRandomSentence.sol')
 
 contract('Props', function (accounts) {
   let instance
 
   beforeEach(function () {
-    return Props.new().then(function (_instance) {
-      instance = _instance
-    })
+    return FakeRandomSentence.new()
+      .then(function (fake) {
+        return Props.new(fake.address)
+      })
+      .then(function (props) {
+        instance = props
+      })
   })
 
   describe('PropsGiven event', function () {

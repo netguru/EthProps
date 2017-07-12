@@ -15,8 +15,8 @@ contract Props is PullPayment {
     event PropsGiven(string from, string to, string description, uint sentWei, bytes32 sentence);
     event UserRegistered(string username);
 
-    function Props(address sentenceContractAddress) {
-        randomSentence = RandomSentence(sentenceContractAddress);
+    function Props(RandomSentence _randomSentence) {
+        randomSentence = _randomSentence;
     }
 
     function register(string username) {

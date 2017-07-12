@@ -1,4 +1,5 @@
 let Props = artifacts.require('./Props.sol')
+let FakeRandomSentence = artifacts.require('./FakeRandomSentence.sol')
 
 contract('Props', function (accounts) {
   let instance
@@ -6,16 +7,20 @@ contract('Props', function (accounts) {
   let secondUser = 'second@test.com'
 
   beforeEach(function () {
-    return Props.new().then(function (_instance) {
-      instance = _instance
-    }).then(function () {
-      return Promise.all([
-        instance.register(firstUser),
-        instance.register(secondUser, { from: accounts[1] })
-      ]).then(function () {
+    return FakeRandomSentence.new()
+      .then(function (fake) {
+        return Props.new(fake.address)
+      })
+      .then(function (props) {
+        instance = props
+        return Promise.all([
+          instance.register(firstUser),
+          instance.register(secondUser, { from: accounts[1] })
+        ])
+      })
+      .then(function () {
         return instance.giveProps(firstUser, 'first props', { from: accounts[1], value: web3.toWei(3, 'ether') })
       })
-    })
   })
 
   describe('withdraw', function () {

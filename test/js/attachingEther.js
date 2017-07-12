@@ -1,4 +1,5 @@
 let Props = artifacts.require('./Props.sol')
+let FakeRandomSentence = artifacts.require('./FakeRandomSentence.sol')
 
 contract('Props', function (accounts) {
   let instance
@@ -6,9 +7,13 @@ contract('Props', function (accounts) {
   let secondUser = 'second'
 
   beforeEach(function () {
-    return Props.new().then(function (_instance) {
-      instance = _instance
-    })
+    return FakeRandomSentence.new()
+      .then(function (fake) {
+        return Props.new(fake.address)
+      })
+      .then(function (props) {
+        instance = props
+      })
   })
 
   describe('attaching ether to given props', function () {
