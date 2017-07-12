@@ -21,13 +21,13 @@ module.exports = function () {
     .then(function (props) {
       return Promise.all([
         props.register(user1),
-        props.register(user2, { from: accounts[1]  })
+        props.register(user2, { from: accounts[1] })
       ])
         .then(function () {
           return props.giveProps(user2, 'This man is an expert in blockchain!', { value: web3.toWei(0.3, 'ether') })
         })
     })
     .then(function () {
-      console.log("Seeds done")
+      console.log('Seeds done')
     })
 }
