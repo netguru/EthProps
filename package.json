@@ -28,6 +28,7 @@
     "eslint-plugin-mocha": "^4.11.0",
     "eslint-plugin-promise": "^3.0.0",
     "eslint-plugin-standard": "^2.0.0",
+    "ethereumjs-testrpc": "^4.0.1",
     "html-webpack-plugin": "^2.29.0",
     "json-loader": "^0.5.4",
     "solium": "^0.2.2",
