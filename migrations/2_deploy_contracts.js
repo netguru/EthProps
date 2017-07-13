@@ -26,6 +26,7 @@ function initializeRandomSentence (instance, network) {
 
 function initializeOraclize (instance, network) {
   if (network === 'development') {
+    console.log('Mocking oraclize')
     return instance.mockOraclize(ethereumBridgeAddress)
   } else {
     return Promise.resolve()
